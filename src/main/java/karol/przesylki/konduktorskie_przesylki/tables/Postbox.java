@@ -32,6 +32,8 @@ public class Postbox {
 
     private LocalDateTime transportDate;
 
+    private Box_Dimensions type;
+
     @OneToOne
     private Post_Client src_client;
 

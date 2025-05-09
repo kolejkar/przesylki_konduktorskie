@@ -4,6 +4,7 @@ import com.vaadin.flow.router.Route;
 
 import karol.przesylki.konduktorskie_przesylki.repository.PostBoxRepository;
 import karol.przesylki.konduktorskie_przesylki.repository.Post_ClientRepository;
+import karol.przesylki.konduktorskie_przesylki.tables.Box_Dimensions;
 import karol.przesylki.konduktorskie_przesylki.tables.Box_size;
 import karol.przesylki.konduktorskie_przesylki.tables.Box_status;
 import karol.przesylki.konduktorskie_przesylki.tables.Post_Client;
@@ -16,21 +17,18 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToDoubleConverter;
 
-@Route("")
+@Route("/order")
 public class Order extends VerticalLayout {
 
     @Autowired
@@ -46,6 +44,7 @@ public class Order extends VerticalLayout {
     private Checkbox overweight;
     private Checkbox src_punkt;
     private Checkbox dest_punkt;
+    private Checkbox cilinder;
     private Label total_price;
 
     private Double shipping_price;
@@ -102,6 +101,18 @@ public class Order extends VerticalLayout {
                 postBox.setShipping_price(shipping_price);
                 postBox.setTransportDate(LocalDateTime.now());
                 postBox.setStatus(Box_status.PayedPost);
+                if (overweight.getValue())
+                {
+                    postBox.setType(Box_Dimensions.Oversize);
+                }
+                else if (cilinder.getValue())
+                {
+                    postBox.setType(Box_Dimensions.Cilinder);
+                }
+                else
+                {
+                    postBox.setType(Box_Dimensions.Normal);
+                }
                 postBoxRepo.save(postBox);
             }
         });
@@ -214,7 +225,7 @@ public class Order extends VerticalLayout {
 
         H3 info = new H3("Sprawdzanie rodzaju paczki");
 
-        Checkbox cilinder = new Checkbox("Przesyłka rulonowa", false);
+        cilinder = new Checkbox("Przesyłka rulonowa", false);
         cilinder.addValueChangeListener(e -> { ValidateOrder(); CheckPrice(); });
 
         Label box_size = new Label("Wymiary przesyłki:");
