@@ -84,7 +84,7 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
     {
         Post_Client postClient = postbox.getSrc_client();
 
-        String info = "Nimię: " + postClient.getName() + "\n";
+        String info = "Imię: " + postClient.getName() + "\n";
         info = info + "Nazwisko: " + postClient.getSurname() + "\n";
         info = info + "Numer telefonu: " + postClient.getPhone_nuber() + "\n";
         info = info + "Adress: " + postClient.getAdress() + "\n";

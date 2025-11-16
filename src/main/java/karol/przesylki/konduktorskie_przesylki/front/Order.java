@@ -1,6 +1,8 @@
 package karol.przesylki.konduktorskie_przesylki.front;
 
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinRequest;
 
 import karol.przesylki.konduktorskie_przesylki.repository.PostBoxRepository;
 import karol.przesylki.konduktorskie_przesylki.repository.Post_ClientRepository;
@@ -13,10 +15,12 @@ import karol.przesylki.konduktorskie_przesylki.tables.Postbox;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.H1;
@@ -114,6 +118,10 @@ public class Order extends VerticalLayout {
                     postBox.setType(Box_Dimensions.Normal);
                 }
                 postBoxRepo.save(postBox);
+                String hostname =VaadinRequest.getCurrent().getHeader("host");
+                String viewURL = hostname + "/detail/" + postBox.getId();
+                QueryParameters param = QueryParameters.simple(Collections.singletonMap("order", viewURL));
+                UI.getCurrent().navigate("/order/fin", param);
             }
         });
         add(button);
@@ -163,12 +171,12 @@ public class Order extends VerticalLayout {
             .bind(Post_Client::getSurname, Post_Client::setSurname);
         TextField dest_phone = new TextField("Numer telefonu:"); 
         binder_client2.forField(dest_phone)
-            .asRequired("Numer telefonu jest wymagne")
+            .asRequired("Numer telefonu jest wymagny")
             .withNullRepresentation("")
             .bind(Post_Client::getPhone_nuber, Post_Client::setPhone_nuber);
         TextField dest_station = new TextField("Stacja:"); 
         binder_client2.forField(dest_station)
-            .asRequired("Stacja docelowa jest wymagny")
+            .asRequired("Stacja docelowa jest wymagna")
             .withNullRepresentation("")
             .withValidator(station -> !dest_punkt.getValue() || (dest_punkt.getValue() && punkt_stations.stream().anyMatch(p -> p.equals(station.toString()))),"Zły punkt przesyłek konduktorskich")
             .bind(Post_Client::getStation, Post_Client::setStation); 
@@ -200,7 +208,7 @@ public class Order extends VerticalLayout {
             .bind(Post_Client::getSurname, Post_Client::setSurname);
         TextField src_phone = new TextField("Numer telefonu:"); 
         binder_client1.forField(src_phone)
-            .asRequired("Numer telefonu jest wymagne")
+            .asRequired("Numer telefonu jest wymagny")
             .withNullRepresentation("")
             .bind(Post_Client::getPhone_nuber, Post_Client::setPhone_nuber);
         TextField src_station = new TextField("Stacja:"); 
@@ -211,7 +219,7 @@ public class Order extends VerticalLayout {
             .bind(Post_Client::getStation, Post_Client::setStation); 
         TextField src_adress = new TextField("Adress:");
         binder_client1.forField(src_adress)
-            .asRequired("Numer telefonu jest wymagny")
+            .asRequired("Adres jest wymagny")
             .withNullRepresentation("")
             .bind(Post_Client::getAdress,Post_Client::setAdress);
             binder_client1.forField(src_punkt).bind(Post_Client::getCollection_order, Post_Client::setCollection_order);
