@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
@@ -13,6 +14,8 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 
+import karol.przesylki.konduktorskie_przesylki.front.menu.MenuGUI;
+import karol.przesylki.konduktorskie_przesylki.repository.ConductorRepository;
 import karol.przesylki.konduktorskie_przesylki.repository.PostBoxRepository;
 import karol.przesylki.konduktorskie_przesylki.tables.Box_status;
 import karol.przesylki.konduktorskie_przesylki.tables.Post_Client;
@@ -43,14 +46,17 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
         GetClientDetails(postBox);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CONDUKTOR")))
+		if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CONDUKTOR") || a.getAuthority().equals("ROLE_ADMIN")))
 		{
 			GetConductorDetails(postBox);
 		}
     }
 
-    public BoxDetails()
+    public BoxDetails(ConductorRepository conductorRepo)
     {
+        MenuGUI menu = new MenuGUI(conductorRepo);
+		add(menu);
+
         info = new H1("Informacje o paczce konduktorskiej");
         box_info = new H3("Podstawowe informacje");
         src_info = new H3("Nadawca informacje");
@@ -126,6 +132,8 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
 
             accept.addClickListener(e -> {
                 postBox.setStatus(Box_status.InProgressPost);
+                postBoxRepo.save(postBox);
+                UI.getCurrent().navigate("/detail/" + postBox.getId());
             });
 
             dismis.addClickListener(e -> {
@@ -140,6 +148,8 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
             Button finish = new Button("Wydaj paczkę");
             finish.addClickListener(e -> {
                 postBox.setStatus(Box_status.DeliveredPost);
+                postBoxRepo.save(postBox);
+                UI.getCurrent().navigate("/detail/" + postBox.getId());
             });
             add(finish);
         }

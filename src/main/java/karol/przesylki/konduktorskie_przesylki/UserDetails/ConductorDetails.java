@@ -16,6 +16,11 @@ public class ConductorDetails implements UserDetails {
 
     private Conductor conductor; 
 
+    public ConductorDetails(Conductor conductor)
+    {
+        this.conductor = conductor;
+    }
+
     @Transactional
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -32,7 +37,7 @@ public class ConductorDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return conductor.getConductor_indeficator();        
+        return conductor.getConductorIndeficator();        
     }
 
     @Override

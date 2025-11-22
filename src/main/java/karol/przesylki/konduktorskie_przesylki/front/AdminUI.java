@@ -18,6 +18,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.Route;
 
+import karol.przesylki.konduktorskie_przesylki.front.menu.MenuGUI;
 import karol.przesylki.konduktorskie_przesylki.repository.ConductorRepository;
 import karol.przesylki.konduktorskie_przesylki.tables.Conductor;
 import karol.przesylki.konduktorskie_przesylki.tables.ERole;
@@ -26,31 +27,25 @@ import karol.przesylki.konduktorskie_przesylki.tables.Role;
 @Route("/admin")
 public class AdminUI extends VerticalLayout {
 
-    @Autowired
-    private ConductorRepository conductorRepo;
-
     private Binder<Conductor> binder_conductor;
 
     private Grid<Conductor> conductorGrid;
     private Button deleteConductor;
 
-    AdminUI()
+    AdminUI(ConductorRepository conductorRepo)
     {
         binder_conductor = new BeanValidationBinder<>(Conductor.class);
         Conductor conductor = new Conductor();
         binder_conductor.setBean(conductor);
-        AddConductor();
-        ShowConductors();
+        Hearder(conductorRepo);
+        AddConductor(conductorRepo);
+        ShowConductors(conductorRepo);
     }
 
-    private void Hearder()
+    private void Hearder(ConductorRepository conductorRepo)
     {
-        H1 hearder = new H1("Panel administracyjny");
-        Button logout = new Button("Wyloguj");
-        logout.addClickListener(clickEvent -> {
-			UI.getCurrent().getPage().setLocation("logout");
-		});
-
+        MenuGUI menu = new MenuGUI(conductorRepo);
+		add(menu);
     }
 
     /*private void ValidateConductor()
@@ -58,12 +53,12 @@ public class AdminUI extends VerticalLayout {
         binder_conductor.validate();
     }*/
 
-    private void AddConductor()
+    private void AddConductor(ConductorRepository conductorRepo)
     {
         TextField conductor_id = new TextField("Numer indefikatora konduktora:");
         binder_conductor.forField(conductor_id)
             .asRequired("Musi być podany numer indefikatora konduktora")
-            .bind(Conductor::getConductor_indeficator, Conductor::setConductor_indeficator);
+            .bind(Conductor::getConductorIndeficator, Conductor::setConductorIndeficator);
 
         TextField conductor_name = new TextField("Nazwa konduktora:");
         binder_conductor.forField(conductor_name)
@@ -88,7 +83,7 @@ public class AdminUI extends VerticalLayout {
 			    roles.add(role);
 
                 Conductor conductor= new Conductor();
-                conductor.setConductor_indeficator(conductor_id.getValue());
+                conductor.setConductorIndeficator(conductor_id.getValue());
                 conductor.setName(conductor_name.getValue());
                 conductor.setPassword(conductor_password.getValue());
                 conductor.setRole(roles);
@@ -99,13 +94,13 @@ public class AdminUI extends VerticalLayout {
         add(conductor_id, conductor_name, conductor_password, save_conductor);
     }
 
-    private void RemoveConductor(Conductor conductor)
+    private void RemoveConductor(ConductorRepository conductorRepo, Conductor conductor)
     {
 			conductorRepo.deleteById(conductor.getId());
             Notification.show("Usunięto konduktora");
     }
 
-    private void ShowConductors()
+    private void ShowConductors(ConductorRepository conductorRepo)
     {
         deleteConductor = new Button("Usuwanie konduktora");
 
@@ -115,7 +110,7 @@ public class AdminUI extends VerticalLayout {
         SingleSelect<Grid<Conductor>, Conductor> conductorSelect =
 		        conductorGrid.asSingleSelect();
         deleteConductor.addClickListener(clickEvent -> {
-			RemoveConductor(conductorSelect.getValue());
+			RemoveConductor(conductorRepo, conductorSelect.getValue());
 		});
 
         add(conductorGrid, deleteConductor);

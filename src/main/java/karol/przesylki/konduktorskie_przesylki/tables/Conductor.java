@@ -13,10 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import lombok.Data;
 import lombok.Singular;
@@ -30,8 +30,8 @@ public class Conductor {
 	private Integer id;
 	
 	@NotEmpty
-    @Email
-	private String conductor_indeficator;
+	@Column(name = "conductor_indeficator")
+	private String conductorIndeficator;
 	
 	@NotEmpty
 	@Size(min = 8, max = 64, message = "Password must be 8-64 char long")

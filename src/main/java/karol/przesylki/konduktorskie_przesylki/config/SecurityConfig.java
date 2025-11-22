@@ -1,5 +1,8 @@
 package karol.przesylki.konduktorskie_przesylki.config;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,13 +17,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import karol.przesylki.konduktorskie_przesylki.UserDetails.ConductorDetailsServiceImpl;
+import karol.przesylki.konduktorskie_przesylki.repository.ConductorRepository;
+import karol.przesylki.konduktorskie_przesylki.tables.Conductor;
+import karol.przesylki.konduktorskie_przesylki.tables.ERole;
+import karol.przesylki.konduktorskie_przesylki.tables.Role;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    /*@Bean
+
+	@Autowired
+	private ConductorRepository conductorRepo;
+
+    @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl();
-    }*/
+        return new ConductorDetailsServiceImpl();
+    }
      
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -38,8 +51,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> builder = auth.inMemoryAuthentication();
-			builder.withUser("admin").password(passwordEncoder().encode("admin#01")).roles("ADMIN");
+		Conductor admin = new Conductor();
+		admin.setConductorIndeficator("admin");
+		admin.setPassword(passwordEncoder().encode("admin#01"));
+		admin.setName("admin");
+
+		Role role = new Role();
+		role.setName(ERole.ROLE_ADMIN);
+			
+		Set<Role> roles =new HashSet();
+		roles.add(role);
+
+		admin.setRole(roles);
+		admin.setId(1);
+
+		conductorRepo.save(admin);
 	}   
 	
 	@Override

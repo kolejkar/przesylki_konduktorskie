@@ -4,6 +4,8 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinRequest;
 
+import karol.przesylki.konduktorskie_przesylki.front.menu.MenuGUI;
+import karol.przesylki.konduktorskie_przesylki.repository.ConductorRepository;
 import karol.przesylki.konduktorskie_przesylki.repository.PostBoxRepository;
 import karol.przesylki.konduktorskie_przesylki.repository.Post_ClientRepository;
 import karol.przesylki.konduktorskie_przesylki.tables.Box_Dimensions;
@@ -63,22 +65,68 @@ public class Order extends VerticalLayout {
         binder_size.validate();
     }
 
-    public Order()
-    {
-        shipping_price = 0.0d;
+    private Postbox postBox;
+    private Box_size box_size;
+    private Post_Client post_Client1;
+    private Post_Client post_Client2;
 
+    private void InitValidation()
+    {
         binder_size = new BeanValidationBinder<>(Box_size.class);
         binder_post = new BeanValidationBinder<>(Postbox.class);
         binder_client1 = new BeanValidationBinder<>(Post_Client.class);
         binder_client2 = new BeanValidationBinder<>(Post_Client.class);
-        Postbox postBox = new Postbox();
-        Box_size box_size = new Box_size();
-        Post_Client post_Client1 = new Post_Client();
-        Post_Client post_Client2 = new Post_Client();
+
         binder_post.setBean(postBox);
         binder_size.setBean(box_size);
         binder_client1.setBean(post_Client1);
         binder_client2.setBean(post_Client2);
+    }
+
+    private void FinishValidate()
+    {
+        if (binder_client1.validate().isOk() && binder_client2.validate().isOk() && binder_post.validate().isOk() && binder_size.validate().isOk())
+        {
+            postBox.setDest_client(post_Client2);
+            postBox.setSrc_client(post_Client1);
+            clientRepo.save(post_Client1);
+            clientRepo.save(post_Client2);
+            postBox.setShipping_price(shipping_price);
+            postBox.setTransportDate(LocalDateTime.now());
+            postBox.setStatus(Box_status.PayedPost);
+            if (overweight.getValue())
+            {
+                postBox.setType(Box_Dimensions.Oversize);
+            }
+            else if (cilinder.getValue())
+            {
+                postBox.setType(Box_Dimensions.Cilinder);
+            }
+            else
+            {
+                postBox.setType(Box_Dimensions.Normal);
+            }
+            postBoxRepo.save(postBox);
+            String hostname =VaadinRequest.getCurrent().getHeader("host");
+            String viewURL = hostname + "/detail/" + postBox.getId();
+            QueryParameters param = QueryParameters.simple(Collections.singletonMap("order", viewURL));
+            UI.getCurrent().navigate("/order/fin", param);
+        }
+    }
+
+    public Order(ConductorRepository conductorRepo)
+    {
+        MenuGUI menu = new MenuGUI(conductorRepo);
+		add(menu);
+
+        shipping_price = 0.0d;
+        
+        postBox = new Postbox();
+        box_size = new Box_size();
+        post_Client1 = new Post_Client();
+        post_Client2 = new Post_Client();
+
+        InitValidation();
 
         H1 info = new H1("Zamawianie przesyłki konduktorskiej");
         total_price = new Label("");
@@ -96,33 +144,7 @@ public class Order extends VerticalLayout {
 
         Button button = new Button("Zapłać");
         button.addClickListener(e -> {
-            if (binder_client1.validate().isOk() && binder_client2.validate().isOk() && binder_post.validate().isOk() && binder_size.validate().isOk())
-            {
-                postBox.setDest_client(post_Client2);
-                postBox.setSrc_client(post_Client1);
-                clientRepo.save(post_Client1);
-                clientRepo.save(post_Client2);
-                postBox.setShipping_price(shipping_price);
-                postBox.setTransportDate(LocalDateTime.now());
-                postBox.setStatus(Box_status.PayedPost);
-                if (overweight.getValue())
-                {
-                    postBox.setType(Box_Dimensions.Oversize);
-                }
-                else if (cilinder.getValue())
-                {
-                    postBox.setType(Box_Dimensions.Cilinder);
-                }
-                else
-                {
-                    postBox.setType(Box_Dimensions.Normal);
-                }
-                postBoxRepo.save(postBox);
-                String hostname =VaadinRequest.getCurrent().getHeader("host");
-                String viewURL = hostname + "/detail/" + postBox.getId();
-                QueryParameters param = QueryParameters.simple(Collections.singletonMap("order", viewURL));
-                UI.getCurrent().navigate("/order/fin", param);
-            }
+            FinishValidate();
         });
         add(button);
     }
