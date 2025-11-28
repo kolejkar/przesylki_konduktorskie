@@ -107,8 +107,7 @@ public class Order extends VerticalLayout {
                 postBox.setType(Box_Dimensions.Normal);
             }
             postBoxRepo.save(postBox);
-            String hostname =VaadinRequest.getCurrent().getHeader("host");
-            String viewURL = hostname + "/detail/" + postBox.getId();
+            String viewURL = "detail/" + postBox.getId();
             QueryParameters param = QueryParameters.simple(Collections.singletonMap("order", viewURL));
             UI.getCurrent().navigate("/order/fin", param);
         }

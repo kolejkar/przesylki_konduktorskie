@@ -2,6 +2,7 @@
   "name": "no-name",
   "license": "UNLICENSED",
   "dependencies": {
+    "@granite-elements/granite-qrcode-scanner": "3.0.3",
     "@polymer/iron-a11y-announcer": "3.0.2",
     "@polymer/iron-a11y-keys-behavior": "3.0.1",
     "@polymer/iron-fit-behavior": "3.0.2",
@@ -55,6 +56,7 @@
     "@vaadin/vaadin-radio-button": "1.5.4",
     "@vaadin/vaadin-rich-text-editor": "1.3.1",
     "@vaadin/vaadin-select": "2.4.2",
+    "@vaadin/vaadin-shrinkwrap": "14.8.3",
     "@vaadin/vaadin-split-layout": "4.3.0",
     "@vaadin/vaadin-tabs": "3.2.0",
     "@vaadin/vaadin-text-field": "2.9.0",
@@ -91,6 +93,7 @@
   },
   "vaadin": {
     "dependencies": {
+      "@granite-elements/granite-qrcode-scanner": "3.0.3",
       "@polymer/iron-a11y-announcer": "3.0.2",
       "@polymer/iron-a11y-keys-behavior": "3.0.1",
       "@polymer/iron-fit-behavior": "3.0.2",
@@ -144,6 +147,7 @@
       "@vaadin/vaadin-radio-button": "1.5.4",
       "@vaadin/vaadin-rich-text-editor": "1.3.1",
       "@vaadin/vaadin-select": "2.4.2",
+      "@vaadin/vaadin-shrinkwrap": "14.8.3",
       "@vaadin/vaadin-split-layout": "4.3.0",
       "@vaadin/vaadin-tabs": "3.2.0",
       "@vaadin/vaadin-text-field": "2.9.0",
@@ -178,6 +182,6 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "af1445d96cfe05468885e92b4abce988884783fccdcdfbda9aa9169f04aa2643"
+    "hash": "978b275a3e43c3bef7ae8bfde689d4c3603d3db58f015c7c0763d8ea5555dea7"
   }
 }

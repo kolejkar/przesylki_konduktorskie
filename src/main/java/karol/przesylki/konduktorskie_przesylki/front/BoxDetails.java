@@ -8,6 +8,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -46,7 +47,7 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
         GetClientDetails(postBox);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CONDUKTOR") || a.getAuthority().equals("ROLE_ADMIN")))
+		if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CONDUKTOR")))
 		{
 			GetConductorDetails(postBox);
 		}
@@ -125,6 +126,8 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
 
     private void GetConductorDetails(Postbox postBox)
     {
+        H1 section = new H1("Zmiana statusu paczki:");
+        add(section);
         if (postBox.getStatus() == Box_status.AcceptPost || postBox.getStatus() == Box_status.PayedPost)
         {
             Button accept = new Button("Akceptuj paczkę");
@@ -151,6 +154,11 @@ public class BoxDetails extends VerticalLayout implements BeforeEnterObserver {
                 postBoxRepo.save(postBox);
                 UI.getCurrent().navigate("/detail/" + postBox.getId());
             });
+            add(finish);
+        }
+        if (postBox.getStatus() == Box_status.DeliveredPost)
+        {
+            Label finish = new Label("Paczka dostarczona");
             add(finish);
         }
     }

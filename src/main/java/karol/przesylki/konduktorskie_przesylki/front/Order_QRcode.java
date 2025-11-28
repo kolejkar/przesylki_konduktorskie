@@ -55,7 +55,7 @@ public class Order_QRcode extends VerticalLayout implements BeforeEnterObserver 
         QRCodeWriter codeWriter = new QRCodeWriter();
         BitMatrix bitMatrix;
         try {
-            bitMatrix = codeWriter.encode(text, BarcodeFormat.QR_CODE, 1000, 1000);
+            bitMatrix = codeWriter.encode(text, BarcodeFormat.QR_CODE, 250, 250);
         } catch (WriterException e) {
             throw new RuntimeException(e);
         }

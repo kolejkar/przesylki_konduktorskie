@@ -3,9 +3,14 @@ package karol.przesylki.konduktorskie_przesylki.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.tomcat.util.net.SSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
@@ -16,6 +21,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 
 import karol.przesylki.konduktorskie_przesylki.UserDetails.ConductorDetailsServiceImpl;
 import karol.przesylki.konduktorskie_przesylki.repository.ConductorRepository;
@@ -49,6 +56,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
+	/*@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { 
+    	http.requiresChannel(channel -> channel.anyRequest().requiresSecure()).authorizeRequests(auth -> auth.anyRequest().permitAll());
+    	return http.build(); 
+	}*/
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		Conductor admin = new Conductor();
@@ -58,6 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		Role role = new Role();
 		role.setName(ERole.ROLE_ADMIN);
+		role.setName(ERole.ROLE_CONDUKTOR);
 			
 		Set<Role> roles =new HashSet();
 		roles.add(role);
@@ -76,12 +90,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	        .csrf().disable()
 	        .authorizeRequests()
 	        //.antMatchers("/company/**").hasRole("COMPANY")
-	        //.antMatchers("/traincar/view/detail/**").hasRole("RAILWAY")
+	        .antMatchers("/conductor/**").hasAnyRole("CONDUKTOR")
 	        .antMatchers("/admin/**").hasRole("ADMIN")
 	        .antMatchers("**").permitAll()
 	        .and()
 	        .formLogin();
+			http.requiresChannel(channel -> channel.anyRequest().requiresSecure()).authorizeRequests(auth -> auth.anyRequest().permitAll());
 	    }
+
+		/*RestTemplate restTemplate() throws Exception {
+    		SSLContext sslContext = new SSLContextBuilder()
+      			.loadTrustMaterial(trustStore.getURL(), trustStorePassword.toCharArray())
+      			.build();
+    		SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+    		HttpClient httpClient = HttpClients.custom()
+      			.setSSLSocketFactory(socketFactory)
+      			.build();
+    		HttpComponentsClientHttpRequestFactory factory = 
+      			new HttpComponentsClientHttpRequestFactory(httpClient);
+    		return new RestTemplate(factory);
+		}*/
 	  
 	  /**
 	   * Allows access to static resources, bypassing Spring security.
